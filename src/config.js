@@ -4,10 +4,9 @@
 // This file contains all configuration settings for the frontend application
 // Keeping configuration in one place makes it easy to update when deploying
 
-// IMPORTANT: Update this URL when you deploy your backend to AWS or Render.com
-// Local development: 'http://localhost:3000'
-// Production: 'https://your-backend-url.com'
-export const API_BASE_URL = 'http://localhost:3000';
+// IMPORTANT: Controlled by Vite env var. Set VITE_API_BASE_URL in .env files.
+// Fallbacks to localhost in dev if not provided.
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 // API Endpoints - These match the routes in your Express.js backend
 export const API_ENDPOINTS = {
