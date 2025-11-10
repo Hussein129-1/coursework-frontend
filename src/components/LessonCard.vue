@@ -15,10 +15,17 @@
 <template>
   <!-- Main card container -->
   <div class="lesson-card">
-    <!-- Icon Section - Displays Font Awesome icon for the lesson -->
-    <div class="lesson-icon">
-      <!-- :class dynamically binds the icon class from lesson data -->
-      <i :class="['fas', lesson.icon]"></i>
+    <!-- Image Section - Displays lesson image from backend -->
+    <div class="lesson-image-container">
+      <img 
+        :src="lessonImageUrl" 
+        :alt="lesson.subject"
+        class="lesson-image"
+        @error="handleImageError"
+      />
+      <div class="lesson-image-overlay">
+        <i :class="['fas', lessonIcon]"></i>
+      </div>
     </div>
     
     <!-- Content Section -->
@@ -77,6 +84,8 @@
 // ========================================
 // COMPONENT LOGIC (using Vue 3 Composition API)
 // ========================================
+import { computed, ref } from 'vue';
+import { API_BASE_URL } from '../config.js';
 
 // Define props - Data this component receives from parent
 // defineProps is a Vue 3 compiler macro (no import needed)
@@ -91,7 +100,7 @@ const props = defineProps({
     //   location: String,
     //   price: Number,
     //   spaces: Number,
-    //   icon: String,
+    //   image: String,
     //   description: String
     // }
   }
@@ -100,6 +109,44 @@ const props = defineProps({
 // Define emits - Events this component can send to parent
 // defineEmits is a Vue 3 compiler macro
 const emit = defineEmits(['add-to-cart']);
+
+// Map subjects to Font Awesome icons
+const subjectIcons = {
+  'Mathematics': 'fa-calculator',
+  'English Literature': 'fa-book',
+  'Science': 'fa-flask',
+  'Computer Programming': 'fa-laptop-code',
+  'Art & Design': 'fa-palette',
+  'Music Theory': 'fa-music',
+  'Physical Education': 'fa-running',
+  'History': 'fa-landmark',
+  'Geography': 'fa-globe',
+  'Spanish Language': 'fa-language',
+  'Chemistry': 'fa-atom',
+  'Drama & Theatre': 'fa-theater-masks',
+  'Biology': 'fa-dna',
+  'Physics': 'fa-rocket',
+  'Economics': 'fa-chart-line'
+};
+
+// Computed property for lesson image URL
+const lessonImageUrl = computed(() => {
+  if (props.lesson.image) {
+    return `${API_BASE_URL}/images/${props.lesson.image}`;
+  }
+  return 'https://via.placeholder.com/800x600/4F46E5/ffffff?text=No+Image';
+});
+
+// Computed property for lesson icon
+const lessonIcon = computed(() => {
+  return subjectIcons[props.lesson.subject] || 'fa-book';
+});
+
+// Handle image load error
+const imageError = ref(false);
+const handleImageError = () => {
+  imageError.value = true;
+};
 
 /**
  * Add to Cart Handler
@@ -151,25 +198,43 @@ const addToCart = () => {
   border-color: var(--primary-color);
 }
 
-/* Icon container */
-.lesson-icon {
-  /* Circular icon background */
-  width: 60px;
-  height: 60px;
+/* Image container */
+.lesson-image-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.lesson-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.lesson-card:hover .lesson-image {
+  transform: scale(1.05);
+}
+
+/* Icon overlay on image */
+.lesson-image-overlay {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-  
-  /* Center the icon */
   display: flex;
   align-items: center;
   justify-content: center;
-  
-  /* Icon color and size */
   color: white;
-  font-size: 1.5rem;
-  
-  /* Add slight shadow */
+  font-size: 1.25rem;
   box-shadow: var(--shadow-md);
+  opacity: 0.95;
 }
 
 /* Content section - grows to fill space */
