@@ -14,11 +14,11 @@
 -->
 
 <template>
-  <div class="search-bar">
+  <div class="search-bar mb-8">
     <!-- Search Container -->
-    <div class="search-container">
+    <div class="search-container bg-white/90 backdrop-blur rounded-xl shadow-md border-2 border-indigo-100 ring-1 ring-indigo-100">
       <!-- Search Icon -->
-      <div class="search-icon">
+      <div class="search-icon text-indigo-500">
         <!--
           Show spinner when searching, magnifying glass otherwise
           :class dynamically applies classes based on conditions
@@ -38,7 +38,7 @@
         @keyup.esc="clearSearch"
         type="text"
         placeholder="Search lessons by subject, location, price, or spaces..."
-        class="search-input"
+        class="search-input placeholder:text-slate-400"
       />
       
       <!-- Clear Button -->
@@ -49,7 +49,7 @@
       <button
         v-if="searchQuery"
         @click="clearSearch"
-        class="clear-btn"
+        class="clear-btn text-gray-400 hover:text-red-500"
         aria-label="Clear search"
       >
         <i class="fas fa-times"></i>
@@ -57,7 +57,7 @@
     </div>
     
     <!-- Search Help Text -->
-    <div class="search-help">
+    <div class="search-help bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border border-indigo-100 rounded-md">
       <i class="fas fa-info-circle"></i>
       <span>Search across all lesson details. Results update as you type.</span>
       <span v-if="searchQuery" class="search-tip">

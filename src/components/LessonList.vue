@@ -16,6 +16,38 @@
 
 <template>
   <div class="lesson-list-container">
+    <!-- Search Bar Section -->
+    <div class="search-bar mb-6">
+      <div class="search-container bg-white/90 backdrop-blur rounded-xl shadow-md border-2 border-indigo-100 ring-1 ring-indigo-100 flex items-center">
+        <div class="search-icon text-indigo-500 px-4">
+          <i :class="isSearching ? 'fas fa-spinner fa-spin text-xl' : 'fas fa-search text-xl'"></i>
+        </div>
+        <input
+          v-model="searchQuery"
+          @input="handleSearch"
+          @keyup.esc="clearSearch"
+          type="text"
+          placeholder="Search lessons by subject, location, price, or spaces..."
+          class="flex-1 px-4 py-3 border-0 bg-transparent outline-none text-gray-700 placeholder:text-slate-400"
+        />
+        <button
+          v-if="searchQuery"
+          @click="clearSearch"
+          class="px-4 text-gray-400 hover:text-red-500 transition"
+          aria-label="Clear search"
+        >
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="search-help bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border border-indigo-100 rounded-md px-4 py-2 mt-2 flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+        <i class="fas fa-info-circle text-indigo-500"></i>
+        <span>Search across all lesson details. Results update as you type.</span>
+        <span v-if="searchQuery" class="ml-auto font-medium">
+          Press <kbd class="bg-gray-100 border border-gray-300 rounded px-2 py-1 text-xs font-mono shadow-sm">ESC</kbd> to clear
+        </span>
+      </div>
+    </div>
+    
     <!-- Sorting Controls Section -->
     <div class="sort-controls">
       <div class="sort-group">
@@ -60,7 +92,7 @@
       v-if: Conditional rendering
       Only shows this section if there are lessons to display
     -->
-    <div v-if="sortedLessons.length > 0" class="lessons-grid">
+    <div v-if="sortedLessons.length > 0" class="lessons-grid grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <!--
         v-for: List rendering
         Loops through sortedLessons array and creates a LessonCard for each item
@@ -91,6 +123,9 @@
 import { computed, ref } from 'vue';
 import LessonCard from './LessonCard.vue';
 
+// Debounce timer for search
+let searchTimeout = null;
+
 // ========================================
 // PROPS (Data from parent)
 // ========================================
@@ -107,13 +142,17 @@ const props = defineProps({
   sortOrder: {
     type: String,
     default: 'asc'
+  },
+  isSearching: {
+    type: Boolean,
+    default: false
   }
 });
 
 // ========================================
 // EMITS (Events to parent)
 // ========================================
-const emit = defineEmits(['add-to-cart', 'update-sort']);
+const emit = defineEmits(['add-to-cart', 'update-sort', 'search', 'clear-search']);
 
 // ========================================
 // LOCAL STATE
@@ -122,6 +161,7 @@ const emit = defineEmits(['add-to-cart', 'update-sort']);
 // When these change, Vue automatically updates the template
 const localSortBy = ref(props.sortBy);
 const localSortOrder = ref(props.sortOrder);
+const searchQuery = ref('');
 
 // ========================================
 // COMPUTED PROPERTIES
@@ -184,6 +224,31 @@ const updateSorting = () => {
  */
 const handleAddToCart = (lesson) => {
   emit('add-to-cart', lesson);
+};
+
+/**
+ * Handle search input with debouncing
+ */
+const handleSearch = () => {
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+  
+  searchTimeout = setTimeout(() => {
+    const query = searchQuery.value.trim();
+    emit('search', query);
+  }, 300);
+};
+
+/**
+ * Clear search
+ */
+const clearSearch = () => {
+  searchQuery.value = '';
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+  emit('clear-search');
 };
 </script>
 

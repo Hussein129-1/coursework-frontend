@@ -16,15 +16,31 @@
 
 <template>
   <!-- Main Application Container -->
-  <div id="app">
-    <div class="container">
+  <div id="app" class="min-h-screen bg-gray-50">
+    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <!-- Hero Banner -->
+      <div class="w-full mb-8">
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 via-violet-600 to-pink-500 text-white shadow-xl">
+          <div class="p-8 md:p-12">
+            <div class="flex items-center gap-3 text-white/90 mb-2">
+              <i class="fas fa-star text-yellow-300"></i>
+              <span class="uppercase tracking-wide text-xs md:text-sm">Learn • Explore • Grow</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold flex items-center gap-3">
+              <i class="fas fa-graduation-cap"></i>
+              After School Classes
+            </h1>
+            <p class="mt-2 text-white/90 text-base md:text-lg">Book your favorite classes and activities</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="inline-flex items-center gap-2 bg-white/15 rounded-full px-3 py-1 text-sm"><i class="fas fa-book-open"></i> 15+ Subjects</span>
+              <span class="inline-flex items-center gap-2 bg-white/15 rounded-full px-3 py-1 text-sm"><i class="fas fa-user-graduate"></i> Expert Tutors</span>
+              <span class="inline-flex items-center gap-2 bg-white/15 rounded-full px-3 py-1 text-sm"><i class="fas fa-clock"></i> Flexible Times</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Application Header -->
-      <header class="app-header">
-        <h1>
-          <i class="fas fa-graduation-cap"></i>
-          After School Classes
-        </h1>
-        <p class="subtitle">Book your favorite classes and activities</p>
+      <header class="app-header flex flex-col items-center gap-2">
         
         <!-- Shopping Cart Button -->
         <!--
@@ -33,7 +49,7 @@
           :class - Apply different styles based on current view
         -->
         <button
-          class="btn-primary cart-toggle-btn"
+          class="btn-primary cart-toggle-btn inline-flex items-center gap-2 rounded-lg shadow-sm px-5 py-3"
           :disabled="cartItems.length === 0 && !showCart"
           @click="toggleCart"
           :class="{ 'active': showCart }"
@@ -102,20 +118,16 @@
           v-if - Show lessons when not viewing cart
         -->
         <div v-if="!showCart">
-          <!-- Search Bar Component -->
-          <SearchBar
-            :is-searching="isSearching"
-            @search="handleSearch"
-            @clear-search="clearSearch"
-          />
-          
-          <!-- Lessons List Component -->
+          <!-- Lessons List Component with integrated search -->
           <LessonList
             :lessons="displayedLessons"
             :sort-by="sortBy"
             :sort-order="sortOrder"
+            :is-searching="isSearching"
             @add-to-cart="addToCart"
             @update-sort="updateSort"
+            @search="handleSearch"
+            @clear-search="clearSearch"
           />
         </div>
 
@@ -160,7 +172,6 @@ import LessonList from './components/LessonList.vue';
 import LessonCard from './components/LessonCard.vue';
 import ShoppingCart from './components/ShoppingCart.vue';
 import CheckoutForm from './components/CheckoutForm.vue';
-import SearchBar from './components/SearchBar.vue';
 
 // ========================================
 // REACTIVE STATE

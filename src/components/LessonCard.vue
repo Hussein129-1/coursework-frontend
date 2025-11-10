@@ -14,16 +14,16 @@
 
 <template>
   <!-- Main card container -->
-  <div class="lesson-card">
+  <div class="lesson-card bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 transition">
     <!-- Icon Section - Large icon for visual appeal -->
     <div class="lesson-icon-container">
-      <div class="lesson-icon-circle">
+      <div :class="['lesson-icon-circle', 'mx-auto', 'bg-gradient-to-br', iconColor]">
         <i :class="['fas', lessonIcon]"></i>
       </div>
     </div>
     
     <!-- Content Section -->
-    <div class="lesson-content">
+    <div class="lesson-content p-4">
       <!-- Lesson subject/title -->
       <h3 class="lesson-subject">{{ lesson.subject }}</h3>
       
@@ -31,23 +31,23 @@
       <p class="lesson-description">{{ lesson.description }}</p>
       
       <!-- Lesson details grid -->
-      <div class="lesson-details">
+      <div class="lesson-details grid grid-cols-3 gap-2">
         <!-- Location -->
-        <div class="detail-item">
-          <i class="fas fa-map-marker-alt"></i>
-          <span>{{ lesson.location }}</span>
+        <div class="detail-item flex items-center gap-1">
+          <i class="fas fa-map-marker-alt text-red-500"></i>
+          <span class="text-sm text-gray-600">{{ lesson.location }}</span>
         </div>
         
         <!-- Price -->
-        <div class="detail-item">
-          <i class="fas fa-pound-sign"></i>
-          <span>£{{ lesson.price }}</span>
+        <div class="detail-item flex items-center gap-1">
+          <i class="fas fa-pound-sign text-green-600"></i>
+          <span class="text-sm font-semibold text-gray-700">£{{ lesson.price }}</span>
         </div>
         
         <!-- Available spaces -->
-        <div class="detail-item">
-          <i class="fas fa-users"></i>
-          <span>{{ lesson.spaces }} spaces left</span>
+        <div class="detail-item flex items-center gap-1">
+          <i class="fas fa-users text-blue-500"></i>
+          <span class="text-sm text-gray-600">{{ lesson.spaces }}</span>
         </div>
       </div>
     </div>
@@ -61,7 +61,7 @@
         :class - Conditionally adds 'btn-disabled' class when spaces = 0
       -->
       <button 
-        class="btn-primary add-to-cart-btn"
+        class="btn-primary add-to-cart-btn w-full justify-center mt-2"
         :disabled="lesson.spaces === 0"
         :class="{ 'btn-disabled': lesson.spaces === 0 }"
         @click="addToCart"
@@ -122,9 +122,33 @@ const subjectIcons = {
   'Economics': 'fa-chart-line'
 };
 
+// Map subjects to colors
+const subjectColors = {
+  'Mathematics': 'from-blue-500 to-blue-600',
+  'English Literature': 'from-amber-500 to-amber-600',
+  'Science': 'from-green-500 to-green-600',
+  'Computer Programming': 'from-purple-500 to-purple-600',
+  'Art & Design': 'from-pink-500 to-pink-600',
+  'Music Theory': 'from-indigo-500 to-indigo-600',
+  'Physical Education': 'from-red-500 to-red-600',
+  'History': 'from-yellow-600 to-yellow-700',
+  'Geography': 'from-teal-500 to-teal-600',
+  'Spanish Language': 'from-orange-500 to-orange-600',
+  'Chemistry': 'from-cyan-500 to-cyan-600',
+  'Drama & Theatre': 'from-rose-500 to-rose-600',
+  'Biology': 'from-lime-500 to-lime-600',
+  'Physics': 'from-violet-500 to-violet-600',
+  'Economics': 'from-emerald-500 to-emerald-600'
+};
+
 // Computed property for lesson icon
 const lessonIcon = computed(() => {
   return subjectIcons[props.lesson.subject] || 'fa-book';
+});
+
+// Computed property for icon color gradient
+const iconColor = computed(() => {
+  return subjectColors[props.lesson.subject] || 'from-indigo-500 to-indigo-600';
 });
 
 /**
@@ -192,13 +216,12 @@ const addToCart = () => {
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 2.5rem;
-  box-shadow: 0 8px 16px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
 }
 
