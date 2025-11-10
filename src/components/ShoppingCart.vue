@@ -102,13 +102,22 @@
       v-if: Only show summary when there are items in cart
     -->
     <div v-if="cartItems.length > 0" class="cart-summary">
+      <div class="summary-header">
+        <i class="fas fa-calculator"></i>
+        <h3>Order Summary</h3>
+      </div>
       <div class="summary-row">
-        <span>Total Items:</span>
+        <span><i class="fas fa-shopping-basket"></i> Total Items:</span>
         <strong>{{ totalQuantity }}</strong>
       </div>
+      <div class="summary-row">
+        <span><i class="fas fa-ticket-alt"></i> Total Lessons:</span>
+        <strong>{{ cartItems.length }}</strong>
+      </div>
+      <div class="summary-divider"></div>
       <div class="summary-row total">
-        <span>Total Price:</span>
-        <strong>£{{ totalPrice.toFixed(2) }}</strong>
+        <span><i class="fas fa-pound-sign"></i> Total Price:</span>
+        <strong class="price-highlight">£{{ totalPrice.toFixed(2) }}</strong>
       </div>
     </div>
   </div>
@@ -351,26 +360,75 @@ const closeCart = () => {
 
 /* Cart Summary */
 .cart-summary {
-  background: var(--surface);
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(139, 92, 246, 0.05));
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-lg);
   border: 2px solid var(--primary-color);
+  margin-top: var(--spacing-xl);
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.summary-header i {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.summary-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.25rem;
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
-  padding: var(--spacing-sm) 0;
-  font-size: 0.975rem;
+  align-items: center;
+  padding: var(--spacing-md) 0;
+  font-size: 1rem;
+}
+
+.summary-row span {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--text-secondary);
+}
+
+.summary-row span i {
+  color: var(--primary-color);
+  width: 20px;
+}
+
+.summary-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+  margin: var(--spacing-md) 0;
 }
 
 .summary-row.total {
-  border-top: 2px solid var(--border-color);
   margin-top: var(--spacing-sm);
-  padding-top: var(--spacing-md);
-  font-size: 1.25rem;
+  padding-top: var(--spacing-lg);
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--primary-color);
+  border-top: 3px solid var(--primary-color);
+}
+
+.price-highlight {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 2rem;
 }
 
 /* Responsive Design */
