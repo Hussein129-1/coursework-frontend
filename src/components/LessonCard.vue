@@ -15,15 +15,9 @@
 <template>
   <!-- Main card container -->
   <div class="lesson-card">
-    <!-- Image Section - Displays lesson image from backend -->
-    <div class="lesson-image-container">
-      <img 
-        :src="lessonImageUrl" 
-        :alt="lesson.subject"
-        class="lesson-image"
-        @error="handleImageError"
-      />
-      <div class="lesson-image-overlay">
+    <!-- Icon Section - Large icon for visual appeal -->
+    <div class="lesson-icon-container">
+      <div class="lesson-icon-circle">
         <i :class="['fas', lessonIcon]"></i>
       </div>
     </div>
@@ -84,8 +78,7 @@
 // ========================================
 // COMPONENT LOGIC (using Vue 3 Composition API)
 // ========================================
-import { computed, ref } from 'vue';
-import { API_BASE_URL } from '../config.js';
+import { computed } from 'vue';
 
 // Define props - Data this component receives from parent
 // defineProps is a Vue 3 compiler macro (no import needed)
@@ -129,24 +122,10 @@ const subjectIcons = {
   'Economics': 'fa-chart-line'
 };
 
-// Computed property for lesson image URL
-const lessonImageUrl = computed(() => {
-  if (props.lesson.image) {
-    return `${API_BASE_URL}/images/${props.lesson.image}`;
-  }
-  return 'https://via.placeholder.com/800x600/4F46E5/ffffff?text=No+Image';
-});
-
 // Computed property for lesson icon
 const lessonIcon = computed(() => {
   return subjectIcons[props.lesson.subject] || 'fa-book';
 });
-
-// Handle image load error
-const imageError = ref(false);
-const handleImageError = () => {
-  imageError.value = true;
-};
 
 /**
  * Add to Cart Handler
@@ -198,43 +177,34 @@ const addToCart = () => {
   border-color: var(--primary-color);
 }
 
-/* Image container */
-.lesson-image-container {
-  position: relative;
-  width: 100%;
-  height: 200px;
-  overflow: hidden;
-  border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-md);
+/* Icon container */
+.lesson-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-lg) 0;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(139, 92, 246, 0.05));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  margin: calc(-1 * var(--spacing-md)) calc(-1 * var(--spacing-md)) var(--spacing-md) calc(-1 * var(--spacing-md));
 }
 
-.lesson-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.lesson-card:hover .lesson-image {
-  transform: scale(1.05);
-}
-
-/* Icon overlay on image */
-.lesson-image-overlay {
-  position: absolute;
-  top: var(--spacing-sm);
-  right: var(--spacing-sm);
-  width: 50px;
-  height: 50px;
+.lesson-icon-circle {
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 1.25rem;
-  box-shadow: var(--shadow-md);
-  opacity: 0.95;
+  font-size: 2.5rem;
+  box-shadow: 0 8px 16px rgba(79, 70, 229, 0.3);
+  transition: all 0.3s ease;
+}
+
+.lesson-card:hover .lesson-icon-circle {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 12px 24px rgba(79, 70, 229, 0.4);
 }
 
 /* Content section - grows to fill space */
