@@ -48,11 +48,24 @@
       <!-- Loading State -->
       <!--
         v-if - Conditionally render based on loading state
-        Shows spinner while fetching data from backend
+        Shows animated spinner while fetching data from backend
       -->
       <div v-if="isLoading" class="loading-state">
-        <i class="fas fa-spinner fa-spin"></i>
-        <p>Loading lessons...</p>
+        <div class="loader-container">
+          <div class="spinner-ring">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <i class="fas fa-graduation-cap loader-icon"></i>
+        </div>
+        <p class="loading-text">Loading lessons...</p>
+        <div class="loading-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
       </div>
 
       <!-- Error State -->
@@ -606,21 +619,127 @@ const submitOrder = async (customerInfo) => {
 /* Loading State */
 .loading-state {
   text-align: center;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-xl) * 2;
   background: var(--surface);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-lg);
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.loading-state i {
-  font-size: 3rem;
+.loader-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Animated spinner ring */
+.spinner-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.spinner-ring div {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 4px solid transparent;
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.spinner-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+  border-top-color: var(--primary-color);
+}
+
+.spinner-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+  border-top-color: var(--primary-hover);
+}
+
+.spinner-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+  border-top-color: var(--success-color);
+}
+
+.spinner-ring div:nth-child(4) {
+  border-top-color: rgba(79, 70, 229, 0.3);
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loader-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.5rem;
   color: var(--primary-color);
-  margin-bottom: var(--spacing-md);
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
-.loading-state p {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+.loading-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.loading-dots {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.loading-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  animation: bounce 1.4s infinite ease-in-out;
+}
+
+.loading-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* Error State */
