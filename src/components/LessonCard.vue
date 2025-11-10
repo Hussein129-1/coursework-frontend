@@ -14,60 +14,53 @@
 
 <template>
   <!-- Main card container -->
-  <div class="lesson-card bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 transition">
+  <div class="card lesson-card h-100 shadow-sm">
     <!-- Icon Section - Large icon for visual appeal -->
-    <div class="lesson-icon-container">
-      <div :class="['lesson-icon-circle', 'mx-auto', 'bg-gradient-to-br', iconColor]">
+    <div class="lesson-icon-container text-center py-4" :style="{background: iconGradient}">
+      <div class="lesson-icon-circle mx-auto">
         <i :class="['fas', lessonIcon]"></i>
       </div>
     </div>
     
     <!-- Content Section -->
-    <div class="lesson-content p-4">
+    <div class="card-body lesson-content">
       <!-- Lesson subject/title -->
-      <h3 class="lesson-subject">{{ lesson.subject }}</h3>
+      <h5 class="card-title lesson-subject fw-bold">{{ lesson.subject }}</h5>
       
       <!-- Lesson description -->
-      <p class="lesson-description">{{ lesson.description }}</p>
+      <p class="card-text lesson-description text-muted small">{{ lesson.description }}</p>
       
-      <!-- Lesson details grid -->
-      <div class="lesson-details grid grid-cols-3 gap-2">
+      <!-- Lesson details -->
+      <div class="lesson-details mt-3">
         <!-- Location -->
-        <div class="detail-item flex items-center gap-1">
-          <i class="fas fa-map-marker-alt text-red-500"></i>
-          <span class="text-sm text-gray-600">{{ lesson.location }}</span>
+        <div class="detail-item mb-2 d-flex align-items-center">
+          <i class="fas fa-map-marker-alt text-danger me-2"></i>
+          <span class="small">{{ lesson.location }}</span>
         </div>
         
         <!-- Price -->
-        <div class="detail-item flex items-center gap-1">
-          <i class="fas fa-pound-sign text-green-600"></i>
-          <span class="text-sm font-semibold text-gray-700">£{{ lesson.price }}</span>
+        <div class="detail-item mb-2 d-flex align-items-center">
+          <i class="fas fa-pound-sign text-success me-2"></i>
+          <span class="fw-bold">£{{ lesson.price }}</span>
         </div>
         
         <!-- Available spaces -->
-        <div class="detail-item flex items-center gap-1">
-          <i class="fas fa-users text-blue-500"></i>
-          <span class="text-sm text-gray-600">{{ lesson.spaces }}</span>
+        <div class="detail-item mb-2 d-flex align-items-center">
+          <i class="fas fa-users text-primary me-2"></i>
+          <span class="small"><span class="badge bg-info">{{ lesson.spaces }}</span> spaces left</span>
         </div>
       </div>
     </div>
     
     <!-- Footer Section with Add to Cart button -->
-    <div class="lesson-footer">
-      <!-- 
-        Button to add lesson to cart
-        :disabled - Disables button when no spaces are available
-        @click - Calls addToCart method when clicked (v-on directive)
-        :class - Conditionally adds 'btn-disabled' class when spaces = 0
-      -->
+    <div class="card-footer lesson-footer bg-transparent border-0">
       <button 
-        class="btn-primary add-to-cart-btn w-full justify-center mt-2"
+        class="btn w-100"
+        :class="lesson.spaces > 0 ? 'btn-primary' : 'btn-secondary'"
         :disabled="lesson.spaces === 0"
-        :class="{ 'btn-disabled': lesson.spaces === 0 }"
         @click="addToCart"
       >
-        <i class="fas fa-shopping-cart"></i>
-        <!-- Show different text based on availability -->
+        <i class="fas fa-shopping-cart me-2"></i>
         {{ lesson.spaces > 0 ? 'Add to Cart' : 'Sold Out' }}
       </button>
     </div>
@@ -147,8 +140,25 @@ const lessonIcon = computed(() => {
 });
 
 // Computed property for icon color gradient
-const iconColor = computed(() => {
-  return subjectColors[props.lesson.subject] || 'from-indigo-500 to-indigo-600';
+const iconGradient = computed(() => {
+  const colors = {
+    'Mathematics': 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+    'English Literature': 'linear-gradient(135deg, #f59e0b, #d97706)',
+    'Science': 'linear-gradient(135deg, #10b981, #059669)',
+    'Computer Programming': 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+    'Art & Design': 'linear-gradient(135deg, #ec4899, #db2777)',
+    'Music Theory': 'linear-gradient(135deg, #6366f1, #4f46e5)',
+    'Physical Education': 'linear-gradient(135deg, #ef4444, #dc2626)',
+    'History': 'linear-gradient(135deg, #eab308, #ca8a04)',
+    'Geography': 'linear-gradient(135deg, #14b8a6, #0d9488)',
+    'Spanish Language': 'linear-gradient(135deg, #f97316, #ea580c)',
+    'Chemistry': 'linear-gradient(135deg, #06b6d4, #0891b2)',
+    'Drama & Theatre': 'linear-gradient(135deg, #f43f5e, #e11d48)',
+    'Biology': 'linear-gradient(135deg, #84cc16, #65a30d)',
+    'Physics': 'linear-gradient(135deg, #a855f7, #9333ea)',
+    'Economics': 'linear-gradient(135deg, #10b981, #059669)'
+  };
+  return colors[props.lesson.subject] || 'linear-gradient(135deg, #6366f1, #4f46e5)';
 });
 
 /**

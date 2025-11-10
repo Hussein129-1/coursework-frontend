@@ -17,33 +17,33 @@
 <template>
   <div class="lesson-list-container">
     <!-- Search Bar Section -->
-    <div class="search-bar mb-6">
-      <div class="search-container bg-white/90 backdrop-blur rounded-xl shadow-md border-2 border-indigo-100 ring-1 ring-indigo-100 flex items-center">
-        <div class="search-icon text-indigo-500 px-4">
-          <i :class="isSearching ? 'fas fa-spinner fa-spin text-xl' : 'fas fa-search text-xl'"></i>
-        </div>
+    <div class="search-bar mb-4">
+      <div class="input-group input-group-lg shadow-sm">
+        <span class="input-group-text bg-primary text-white">
+          <i :class="isSearching ? 'fas fa-spinner fa-spin' : 'fas fa-search'"></i>
+        </span>
         <input
           v-model="searchQuery"
           @input="handleSearch"
           @keyup.esc="clearSearch"
           type="text"
           placeholder="Search lessons by subject, location, price, or spaces..."
-          class="flex-1 px-4 py-3 border-0 bg-transparent outline-none text-gray-700 placeholder:text-slate-400"
+          class="form-control"
         />
         <button
           v-if="searchQuery"
           @click="clearSearch"
-          class="px-4 text-gray-400 hover:text-red-500 transition"
+          class="btn btn-outline-danger"
           aria-label="Clear search"
         >
-          <i class="fas fa-times text-xl"></i>
+          <i class="fas fa-times"></i>
         </button>
       </div>
-      <div class="search-help bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border border-indigo-100 rounded-md px-4 py-2 mt-2 flex items-center gap-2 text-sm text-gray-600 flex-wrap">
-        <i class="fas fa-info-circle text-indigo-500"></i>
+      <div class="alert alert-info mt-2 py-2 d-flex align-items-center small" role="alert">
+        <i class="fas fa-info-circle me-2"></i>
         <span>Search across all lesson details. Results update as you type.</span>
-        <span v-if="searchQuery" class="ml-auto font-medium">
-          Press <kbd class="bg-gray-100 border border-gray-300 rounded px-2 py-1 text-xs font-mono shadow-sm">ESC</kbd> to clear
+        <span v-if="searchQuery" class="ms-auto">
+          Press <kbd class="bg-light border rounded px-2 py-1">ESC</kbd> to clear
         </span>
       </div>
     </div>
@@ -87,24 +87,14 @@
       </div>
     </div>
     
-    <!-- Lessons Grid -->
-    <!--
-      v-if: Conditional rendering
-      Only shows this section if there are lessons to display
-    -->
-    <div v-if="sortedLessons.length > 0" class="lessons-grid grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <!--
-        v-for: List rendering
-        Loops through sortedLessons array and creates a LessonCard for each item
-        :key: Unique identifier for each item (required by Vue for efficient updates)
-        lesson: Current item in the loop
-      -->
-      <LessonCard
-        v-for="lesson in sortedLessons"
-        :key="lesson._id"
-        :lesson="lesson"
-        @add-to-cart="handleAddToCart"
-      />
+    <!-- Lessons Grid - display lesson cards in a responsive grid -->
+    <div v-if="sortedLessons.length > 0" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4 lessons-grid">
+      <div v-for="lesson in sortedLessons" :key="lesson._id" class="col">
+        <LessonCard
+          :lesson="lesson"
+          @add-to-cart="handleAddToCart"
+        />
+      </div>
     </div>
     
     <!-- Empty State - shown when no lessons available -->

@@ -16,31 +16,31 @@
 
 <template>
   <!-- Main Application Container -->
-  <div id="app" class="min-h-screen bg-gray-50">
-    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+  <div id="app" class="min-vh-100 bg-light">
+    <div class="container py-4">
       <!-- Hero Banner -->
-      <div class="w-full mb-8">
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 via-violet-600 to-pink-500 text-white shadow-xl">
-          <div class="p-8 md:p-12">
-            <div class="flex items-center gap-3 text-white/90 mb-2">
-              <i class="fas fa-star text-yellow-300"></i>
-              <span class="uppercase tracking-wide text-xs md:text-sm">Learn • Explore • Grow</span>
+      <div class="mb-4">
+        <div class="card shadow-lg border-0 overflow-hidden">
+          <div class="card-body p-4 p-md-5 text-white" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%)">
+            <div class="d-flex align-items-center gap-2 mb-2 opacity-75">
+              <i class="fas fa-star text-warning"></i>
+              <span class="text-uppercase small">Learn • Explore • Grow</span>
             </div>
-            <h1 class="text-3xl md:text-4xl font-bold flex items-center gap-3">
+            <h1 class="display-4 fw-bold d-flex align-items-center gap-3 mb-3">
               <i class="fas fa-graduation-cap"></i>
               After School Classes
             </h1>
-            <p class="mt-2 text-white/90 text-base md:text-lg">Book your favorite classes and activities</p>
-            <div class="mt-4 flex flex-wrap gap-2">
-              <span class="inline-flex items-center gap-2 bg-white/15 rounded-full px-3 py-1 text-sm"><i class="fas fa-book-open"></i> 15+ Subjects</span>
-              <span class="inline-flex items-center gap-2 bg-white/15 rounded-full px-3 py-1 text-sm"><i class="fas fa-user-graduate"></i> Expert Tutors</span>
-              <span class="inline-flex items-center gap-2 bg-white/15 rounded-full px-3 py-1 text-sm"><i class="fas fa-clock"></i> Flexible Times</span>
+            <p class="lead mb-4">Book your favorite classes and activities</p>
+            <div class="d-flex flex-wrap gap-2">
+              <span class="badge bg-white bg-opacity-25 rounded-pill px-3 py-2"><i class="fas fa-book-open me-1"></i> 15+ Subjects</span>
+              <span class="badge bg-white bg-opacity-25 rounded-pill px-3 py-2"><i class="fas fa-user-graduate me-1"></i> Expert Tutors</span>
+              <span class="badge bg-white bg-opacity-25 rounded-pill px-3 py-2"><i class="fas fa-clock me-1"></i> Flexible Times</span>
             </div>
           </div>
         </div>
       </div>
       <!-- Application Header -->
-      <header class="app-header flex flex-col items-center gap-2">
+      <header class="app-header text-center mb-4">
         
         <!-- Shopping Cart Button -->
         <!--
@@ -49,15 +49,17 @@
           :class - Apply different styles based on current view
         -->
         <button
-          class="btn-primary cart-toggle-btn inline-flex items-center gap-2 rounded-lg shadow-sm px-5 py-3"
+          class="btn btn-lg position-relative"
+          :class="showCart ? 'btn-secondary' : 'btn-primary'"
           :disabled="cartItems.length === 0 && !showCart"
           @click="toggleCart"
-          :class="{ 'active': showCart }"
         >
-          <i class="fas fa-shopping-cart"></i>
+          <i class="fas fa-shopping-cart me-2"></i>
           {{ showCart ? 'View Lessons' : 'View Cart' }}
           <!-- Cart badge showing number of items -->
-          <span v-if="cartItemCount > 0" class="cart-badge">{{ cartItemCount }}</span>
+          <span v-if="cartItemCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {{ cartItemCount }}
+          </span>
         </button>
       </header>
 
