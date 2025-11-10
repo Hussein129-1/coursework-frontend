@@ -1,0 +1,22 @@
+{
+  "name": "afterschool-classes-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Vue.js frontend for After School Classes booking application",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.5.22"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "vite": "npm:rolldown-vite@7.1.14"
+  },
+  "overrides": {
+    "vite": "npm:rolldown-vite@7.1.14"
+  }
+}
