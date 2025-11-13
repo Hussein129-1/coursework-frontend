@@ -17,212 +17,106 @@
 <template>
   <!-- Main Application Container -->
   <div id="app" class="app-shell">
-    <div class="container py-5">
-      <!-- Hero Banner -->
-      <section class="hero-section position-relative overflow-hidden mb-5">
-        <div class="hero-gradient"></div>
-        <div class="hero-content glass-panel p-4 p-md-5 position-relative">
-          <div class="hero-badge badge-soft">
-            <i class="fas fa-star text-warning"></i>
-            Learn • Explore • Grow
-          </div>
-          <div class="hero-heading">
-            <h1 class="hero-title">
-              <i class="fas fa-graduation-cap hero-icon"></i>
-              After School Classes
-            </h1>
-            <p class="hero-subtitle">
-              Book inspiring after school experiences designed to spark curiosity and build confidence.
-            </p>
-          </div>
-          <div class="hero-actions d-flex flex-wrap gap-3">
-            <button class="btn btn-primary btn-lg hero-cta" @click="showCart = false">
-              <i class="fas fa-binoculars me-2"></i>
-              Explore Lessons
-            </button>
-            <button
-              class="btn btn-lg hero-cta hero-secondary"
-              :class="{ active: showCart }"
-              :disabled="cartItems.length === 0 && !showCart"
-              @click="toggleCart"
-            >
-              <i :class="['fas', showCart ? 'fa-book-open' : 'fa-shopping-cart', 'me-2']"></i>
-              {{ showCart ? 'Back to Lessons' : 'View Cart (' + cartItemCount + ')' }}
-            </button>
-          </div>
-          <div class="hero-stats mt-4">
-            <div class="hero-stat">
-              <span class="stat-value">15+</span>
-              <span class="stat-label">Subjects</span>
-            </div>
-            <div class="hero-stat">
-              <span class="stat-value">30</span>
-              <span class="stat-label">Expert Tutors</span>
-            </div>
-            <div class="hero-stat">
-              <span class="stat-value">Flexible</span>
-              <span class="stat-label">Schedules</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Feature Highlights -->
-      <section class="feature-cards row g-4 mb-5">
-        <div class="col-md-4">
-          <div class="feature-card h-100">
-            <div class="feature-icon">
-              <i class="fas fa-lightbulb"></i>
-            </div>
-            <h3>Curated Programmes</h3>
-            <p>Explore a cross-disciplinary catalogue of clubs and sessions handpicked for curious learners.</p>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="feature-card h-100">
-            <div class="feature-icon">
-              <i class="fas fa-wave-square"></i>
-            </div>
-            <h3>Live Availability</h3>
-            <p>Track real-time spaces and secure seats instantly with responsive search and sorting tools.</p>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="feature-card h-100">
-            <div class="feature-icon">
-              <i class="fas fa-heart"></i>
-            </div>
-            <h3>Parent-Friendly Checkout</h3>
-            <p>Keep everything organised with a streamlined cart, smart validation and instant confirmations.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Application Header -->
-      <header class="app-header glass-panel mb-4">
-        <div class="header-copy text-center text-lg-start">
-          <p class="header-kicker text-uppercase fw-semibold mb-1">
-            {{ showCart ? 'Checkout Ready' : 'Smart Planning' }}
-          </p>
-          <h2 class="section-title mb-2">
-            {{ showCart ? 'Review your selections' : 'Find the perfect class mix' }}
-          </h2>
-          <p class="section-subtitle mb-0">
-            {{ showCart
-              ? 'Confirm student details and secure your seats before they fill up.'
-              : 'Use search, filters and live availability to craft an engaging timetable.'
-            }}
+    <div class="app-container">
+      <header class="app-header">
+        <div class="app-header__copy">
+          <h1 class="app-title">
+            <i class="fas fa-graduation-cap"></i>
+            After School Classes
+          </h1>
+          <p class="app-subtitle">
+            Browse after-school lessons and reserve spots instantly.
           </p>
         </div>
-        <div class="header-action ms-lg-auto">
-          <button
-            class="btn btn-lg cart-toggle-btn"
-            :class="showCart ? 'btn-success' : 'btn-primary'"
-            :disabled="cartItems.length === 0 && !showCart"
-            @click="toggleCart"
-          >
-            <i v-if="!showCart" class="fas fa-shopping-cart me-2"></i>
-            <i v-else class="fas fa-arrow-left me-2"></i>
-            {{ showCart ? 'Back to Lessons' : 'View Cart (' + cartItemCount + ')' }}
-          </button>
-        </div>
+        <button
+          class="cart-toggle"
+          :class="{ 'cart-toggle--active': showCart }"
+          :disabled="!showCart && cartItems.length === 0"
+          @click="toggleCart"
+        >
+          <i :class="['fas', showCart ? 'fa-arrow-left' : 'fa-shopping-cart']"></i>
+          <span>{{ showCart ? 'Back to lessons' : `Cart (${cartItemCount})` }}</span>
+        </button>
       </header>
 
-      <!-- Loading State -->
-      <!--
-        v-if - Conditionally render based on loading state
-        Shows animated spinner while fetching data from backend
-      -->
-      <div v-if="isLoading" class="loading-state glass-panel p-5">
-        <div class="loader-container">
-          <div class="spinner-ring">
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
+      <main class="app-main">
+        <section v-if="isLoading" class="panel panel--status">
+          <div class="panel__icon">
+            <i class="fas fa-spinner fa-spin"></i>
           </div>
-          <i class="fas fa-graduation-cap loader-icon"></i>
-        </div>
-        <p class="loading-text">Loading lessons...</p>
-        <div class="loading-dots">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
+          <p class="panel__title">Loading lessons…</p>
+          <p class="panel__subtitle">Hang tight while we fetch the latest availability.</p>
+        </section>
 
-      <!-- Error State -->
-      <div v-else-if="error" class="error-state glass-panel p-5">
-        <i class="fas fa-exclamation-triangle"></i>
-        <h3>Oops! Something went wrong</h3>
-        <p>{{ error }}</p>
-        <button class="btn-primary" @click="fetchLessons">
-          <i class="fas fa-redo"></i>
-          Try Again
-        </button>
-      </div>
-
-      <!-- Main Content -->
-      <div v-else class="content-shell glass-panel p-4 p-lg-5 shadow-lg">
-        <!-- Success Message (after checkout) -->
-        <!--
-          v-if - Only show when order is successfully submitted
-          Success message with auto-dismiss after 5 seconds
-        -->
-        <div v-if="showSuccessMessage" class="success-message">
-          <i class="fas fa-check-circle"></i>
-          <div>
-            <strong>Order Confirmed!</strong>
-            <p>Thank you for your booking. We'll contact you soon.</p>
+        <section v-else-if="error" class="panel panel--status panel--error">
+          <div class="panel__icon">
+            <i class="fas fa-exclamation-triangle"></i>
           </div>
-          <button @click="showSuccessMessage = false" class="close-btn">
-            <i class="fas fa-times"></i>
+          <p class="panel__title">Something went wrong</p>
+          <p class="panel__subtitle">{{ error }}</p>
+          <button class="btn-primary panel__action" @click="fetchLessons">
+            Try again
           </button>
-        </div>
+        </section>
 
-        <!-- Lessons View -->
-        <!--
-          v-if - Show lessons when not viewing cart
-        -->
-        <div v-if="!showCart">
-          <!-- Lessons List Component with integrated search -->
-          <LessonList
-            :lessons="displayedLessons"
-            :sort-by="sortBy"
-            :sort-order="sortOrder"
-            :is-searching="isSearching"
-            @add-to-cart="addToCart"
-            @update-sort="updateSort"
-            @search="handleSearch"
-            @clear-search="clearSearch"
-          />
-        </div>
+        <section v-else class="app-content">
+          <transition name="fade" mode="out-in">
+            <div v-if="showSuccessMessage" key="success" class="alert alert--success">
+              <i class="fas fa-check-circle"></i>
+              <span>Your booking has been confirmed.</span>
+              <button
+                class="alert__dismiss"
+                @click="showSuccessMessage = false"
+                aria-label="Dismiss success message"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </transition>
 
-        <!-- Cart View -->
-        <!--
-          v-else - Show cart when showCart is true
-        -->
-        <div v-else class="cart-view">
-          <!-- Shopping Cart Component -->
-          <ShoppingCart
-            :cart-items="cartItems"
-            @remove-from-cart="removeFromCart"
-            @close-cart="toggleCart"
-          />
-          
-          <!-- Checkout Form Component -->
-          <!--
-            v-if - Only show checkout form when cart has items
-          -->
-          <CheckoutForm
-            v-if="cartItems.length > 0"
-            :cart-items="cartItems"
-            :is-submitting="isSubmittingOrder"
-            @submit-order="submitOrder"
-            ref="checkoutFormRef"
-          />
-        </div>
-      </div>
+          <div v-if="!showCart" class="lessons-view">
+            <LessonList
+              :lessons="displayedLessons"
+              :sort-by="sortBy"
+              :sort-order="sortOrder"
+              :is-searching="isSearching"
+              @add-to-cart="addToCart"
+              @update-sort="updateSort"
+              @search="handleSearch"
+              @clear-search="clearSearch"
+            />
+          </div>
+
+          <div v-else class="cart-view">
+            <section class="cart-column">
+              <ShoppingCart
+                :cart-items="cartItems"
+                @remove-from-cart="removeFromCart"
+                @close-cart="toggleCart"
+              />
+            </section>
+            <section class="checkout-column">
+              <CheckoutForm
+                v-if="cartItems.length > 0"
+                :cart-items="cartItems"
+                :is-submitting="isSubmittingOrder"
+                @submit-order="submitOrder"
+                ref="checkoutFormRef"
+              />
+              <div v-else class="panel panel--status panel--empty">
+                <div class="panel__icon">
+                  <i class="fas fa-box-open"></i>
+                </div>
+                <p class="panel__title">Your cart is empty</p>
+                <p class="panel__subtitle">Add lessons from the list to start checkout.</p>
+                <button class="btn-primary panel__action" @click="toggleCart">
+                  Browse lessons
+                </button>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
     </div>
   </div>
 </template>
@@ -477,7 +371,7 @@ const updateLessonSpaces = async () => {
 // Functions that respond to user interactions
 
 /**
- * Handle search input from SearchBar component
+ * Handle search input from LessonList component
  * Implements "search as you type" functionality
  * @param {String} query - Search query from user
  */
@@ -633,427 +527,207 @@ const submitOrder = async (customerInfo) => {
 </script>
 
 <style scoped>
-/* ========================================
-   COMPONENT STYLES
-   ======================================== */
-
-/* Layout */
 .app-shell {
-  background: transparent;
-}
-
-.content-shell {
-  border: 1px solid rgba(255, 255, 255, 0.6);
-}
-
-/* Hero */
-.hero-section {
-  border-radius: clamp(1rem, 3vw, 2.5rem);
-  box-shadow: 0 35px 80px rgba(79, 70, 229, 0.2);
-}
-
-.hero-gradient {
-  position: absolute;
-  inset: 0;
-  background: var(--primary-gradient);
-  opacity: 0.85;
-  z-index: 0;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 1;
-  border-radius: clamp(1rem, 3vw, 2.5rem);
-  overflow: hidden;
-  color: #fff;
-}
-
-.hero-badge {
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(6px);
-}
-
-.hero-heading {
-  margin-top: var(--spacing-md);
-}
-
-.hero-title {
-  font-size: clamp(2.25rem, 3vw + 1rem, 3.5rem);
-  font-weight: 700;
-  margin: 0 0 var(--spacing-sm);
+  min-height: 100vh;
   display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.hero-icon {
-  font-size: clamp(2rem, 2vw + 1rem, 3rem);
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.hero-subtitle {
-  font-size: 1.125rem;
-  margin-bottom: var(--spacing-lg);
-  opacity: 0.9;
-}
-
-.hero-actions .btn {
-  box-shadow: 0 18px 30px rgba(15, 23, 42, 0.15);
-}
-
-.hero-cta.hero-secondary {
-  background: rgba(255, 255, 255, 0.16);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-.hero-cta.hero-secondary:hover {
-  background: rgba(255, 255, 255, 0.28);
-}
-
-.hero-cta.hero-secondary.active {
-  background: rgba(16, 185, 129, 0.25);
-  border-color: rgba(16, 185, 129, 0.7);
-}
-
-.hero-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: var(--spacing-lg);
-}
-
-.hero-stat {
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-md);
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-}
-
-.stat-value {
-  display: block;
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.stat-label {
-  font-size: 0.875rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-/* Feature Cards */
-.feature-cards {
-  margin-top: clamp(2rem, 3vw, 3rem);
-}
-
-.feature-card {
-  padding: var(--spacing-xl);
-  border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.feature-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15);
-}
-
-.feature-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 18px;
-  background: var(--accent-gradient);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  color: var(--primary-color);
-  margin-bottom: var(--spacing-md);
-}
-
-.feature-card h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: var(--spacing-sm);
-}
-
-.feature-card p {
-  margin: 0;
-  color: var(--text-secondary);
-}
-
-/* Application Header */
-.app-header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-lg);
-  align-items: center;
-  padding: var(--spacing-lg) var(--spacing-xl);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(148, 163, 184, 0.25);
-}
-
-.header-kicker {
-  letter-spacing: 0.18em;
-  color: var(--primary-color);
-  font-size: 0.75rem;
-}
-
-.cart-toggle-btn {
-  position: relative;
-  padding: 0.85rem 1.75rem;
-  font-size: 1rem;
-  min-width: 230px;
-  border-radius: var(--radius-lg);
-}
-
-.cart-toggle-btn.btn-success {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.85), rgba(5, 150, 105, 0.85));
-  border: none;
-}
-
-.cart-toggle-btn.btn-success:hover {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.92));
-}
-
-/* Loading State */
-.loading-state {
-  text-align: center;
-  padding: var(--spacing-xl) * 2;
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  min-height: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
 }
 
-.loader-container {
-  position: relative;
-  width: 120px;
-  height: 120px;
-  margin-bottom: var(--spacing-xl);
-}
-
-/* Animated spinner ring */
-.spinner-ring {
-  position: absolute;
+.app-container {
   width: 100%;
-  height: 100%;
-}
-
-.spinner-ring div {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border: 4px solid transparent;
-  border-top-color: var(--primary-color);
-  border-radius: 50%;
-  animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-}
-
-.spinner-ring div:nth-child(1) {
-  animation-delay: -0.45s;
-  border-top-color: var(--primary-color);
-}
-
-.spinner-ring div:nth-child(2) {
-  animation-delay: -0.3s;
-  border-top-color: var(--primary-hover);
-}
-
-.spinner-ring div:nth-child(3) {
-  animation-delay: -0.15s;
-  border-top-color: var(--success-color);
-}
-
-.spinner-ring div:nth-child(4) {
-  border-top-color: rgba(79, 70, 229, 0.3);
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.loader-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 2.5rem;
-  color: var(--primary-color);
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
-}
-
-.loading-text {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-sm);
-}
-
-.loading-dots {
-  display: flex;
-  gap: var(--spacing-xs);
-}
-
-.loading-dots span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--primary-color);
-  animation: bounce 1.4s infinite ease-in-out;
-}
-
-.loading-dots span:nth-child(1) {
-  animation-delay: -0.32s;
-}
-
-.loading-dots span:nth-child(2) {
-  animation-delay: -0.16s;
-}
-
-@keyframes bounce {
-  0%, 80%, 100% {
-    transform: scale(0);
-    opacity: 0.5;
-  }
-  40% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Error State */
-.error-state {
-  text-align: center;
-  padding: var(--spacing-xl);
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  border: 2px solid var(--danger-color);
-}
-
-.error-state i {
-  font-size: 3rem;
-  color: var(--danger-color);
-  margin-bottom: var(--spacing-md);
-}
-
-.error-state h3 {
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-sm);
-}
-
-.error-state p {
-  color: var(--text-secondary);
-  margin-bottom: var(--spacing-lg);
-}
-
-/* Success Message */
-.success-message {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-lg);
-  background: rgba(16, 185, 129, 0.1);
-  border: 2px solid var(--success-color);
-  border-radius: var(--radius-lg);
-  margin-bottom: var(--spacing-xl);
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.success-message i {
-  font-size: 2rem;
-  color: var(--success-color);
-}
-
-.success-message strong {
-  display: block;
-  color: var(--success-color);
-  font-size: 1.1rem;
-  margin-bottom: var(--spacing-xs);
-}
-
-.success-message p {
-  margin: 0;
-  color: var(--text-secondary);
-}
-
-.close-btn {
-  margin-left: auto;
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: var(--spacing-sm);
-  border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
-}
-
-.close-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--danger-color);
-}
-
-/* Cart View */
-.cart-view {
+  max-width: 1080px;
+  padding: var(--spacing-xl) var(--spacing-lg);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
 }
 
-/* Responsive Design */
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+.app-header__copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.app-title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  color: var(--text-primary);
+}
+
+.app-title i {
+  color: var(--primary-color);
+}
+
+.app-subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.cart-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  padding: 0.65rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cart-toggle i {
+  color: var(--primary-color);
+}
+
+.cart-toggle--active {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: transparent;
+}
+
+.cart-toggle--active i {
+  color: #fff;
+}
+
+.cart-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.app-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.lessons-view {
+  display: flex;
+}
+
+.cart-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.cart-column,
+.checkout-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.panel {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  display: grid;
+  gap: var(--spacing-sm);
+  justify-items: center;
+}
+
+.panel__icon {
+  font-size: 2rem;
+  color: var(--primary-color);
+}
+
+.panel__title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+.panel__subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.panel__action {
+  margin-top: var(--spacing-sm);
+}
+
+.panel--error {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.panel--status {
+  min-height: 220px;
+}
+
+.panel--empty .panel__icon {
+  color: var(--text-secondary);
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-weight: 600;
+}
+
+.alert--success {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: var(--success-color);
+}
+
+.alert__dismiss {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
 @media (max-width: 768px) {
-  .app-header h1 {
-    font-size: 2rem;
-    flex-direction: column;
+  .app-container {
+    padding: var(--spacing-lg) var(--spacing-md);
   }
-  
-  .subtitle {
-    font-size: 1rem;
+
+  .cart-toggle {
+    width: 100%;
+    justify-content: center;
   }
-  
-  .success-message {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .close-btn {
-    margin-left: 0;
+
+  .cart-view {
+    grid-template-columns: 1fr;
   }
 }
 </style>

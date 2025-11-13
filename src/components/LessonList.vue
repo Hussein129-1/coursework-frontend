@@ -20,23 +20,31 @@
       <div class="toolbar-search">
         <label class="toolbar-label" for="lesson-search">Search</label>
         <div class="toolbar-field">
+          <i class="fas fa-search toolbar-icon" aria-hidden="true"></i>
           <input
             id="lesson-search"
+            class="toolbar-input"
             v-model="searchQuery"
             @input="handleSearch"
             @keyup.esc="clearSearch"
             type="search"
-            placeholder="Search by subject, location or price"
-            :aria-busy="isSearching"
+            placeholder="Search subject, location or price"
+            :aria-busy="isBusy"
           />
-          <button v-if="searchQuery" class="toolbar-clear" @click="clearSearch" aria-label="Clear search">
+          <button
+            v-if="searchQuery"
+            class="toolbar-clear"
+            @click="clearSearch"
+            aria-label="Clear search"
+          >
             ×
           </button>
+          <span v-if="isBusy" class="toolbar-spinner" aria-hidden="true"></span>
         </div>
       </div>
       <div class="toolbar-sort">
         <label class="toolbar-label" for="sortBy">Sort by</label>
-        <div class="toolbar-field">
+        <div class="toolbar-field toolbar-field--inline">
           <select id="sortBy" v-model="localSortBy" @change="updateSorting">
             <option value="subject">Subject</option>
             <option value="location">Location</option>
@@ -152,6 +160,8 @@ const sortedLessons = computed(() => {
   return lessonsCopy;
 });
 
+const isBusy = computed(() => props.isSearching && searchQuery.value.trim().length > 0);
+
 // ========================================
 // METHODS (Functions)
 // ========================================
@@ -203,11 +213,11 @@ const clearSearch = () => {
 
 .lesson-toolbar {
   display: grid;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
   padding: var(--spacing-lg);
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
 }
 
@@ -215,45 +225,59 @@ const clearSearch = () => {
 .toolbar-sort {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
 }
 
 .toolbar-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-secondary);
 }
 
 .toolbar-field {
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: auto;
   align-items: center;
   gap: var(--spacing-sm);
+  position: relative;
 }
 
-.toolbar-field input,
-.toolbar-field select {
-  flex: 1;
+.toolbar-field--inline {
+  grid-auto-columns: 1fr;
+}
+
+.toolbar-icon {
+  color: var(--text-secondary);
+}
+
+.toolbar-input {
+  width: 100%;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
-  padding: 0.55rem 0.75rem;
+  padding: 0.65rem 0.75rem 0.65rem 0.75rem;
   font-size: 0.95rem;
   font-family: inherit;
-}
-
-.toolbar-field select {
-  flex: 0;
-  min-width: 140px;
 }
 
 .toolbar-clear {
   border: none;
   background: transparent;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   line-height: 1;
   cursor: pointer;
   color: var(--text-secondary);
-  padding: 0 0.5rem;
+  padding: 0 0.25rem;
+}
+
+.toolbar-spinner {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 2px solid rgba(148, 163, 184, 0.35);
+  border-top-color: var(--primary-color);
+  animation: spin 0.6s linear infinite;
 }
 
 .toolbar-summary {
@@ -264,8 +288,8 @@ const clearSearch = () => {
 
 .lesson-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: var(--spacing-lg);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .lesson-empty {
@@ -277,13 +301,19 @@ const clearSearch = () => {
   color: var(--text-secondary);
 }
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (min-width: 768px) {
   .lesson-toolbar {
-    grid-template-columns: 2fr 2fr auto;
+    grid-template-columns: 2fr 1.5fr auto;
     align-items: center;
   }
 
-  .toolbar-field select:last-child {
+  .toolbar-field--inline select {
     min-width: 120px;
   }
 }
