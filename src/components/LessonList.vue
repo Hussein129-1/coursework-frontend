@@ -15,95 +15,58 @@
 -->
 
 <template>
-  <div class="lesson-list-container">
-    <!-- Search Bar Section -->
-    <div class="search-bar mb-4">
-      <div class="input-group input-group-lg shadow-sm">
-        <span class="input-group-text bg-primary text-white">
-          <i :class="isSearching ? 'fas fa-spinner fa-spin' : 'fas fa-search'"></i>
-        </span>
-        <input
-          v-model="searchQuery"
-          @input="handleSearch"
-          @keyup.esc="clearSearch"
-          type="text"
-          placeholder="Search lessons by subject, location, price, or spaces..."
-          class="form-control"
-        />
-        <button
-          v-if="searchQuery"
-          @click="clearSearch"
-          class="btn btn-outline-danger"
-          aria-label="Clear search"
-        >
-          <i class="fas fa-times"></i>
-        </button>
+  <section class="lesson-list">
+    <header class="lesson-toolbar">
+      <div class="toolbar-search">
+        <label class="toolbar-label" for="lesson-search">Search</label>
+        <div class="toolbar-field">
+          <input
+            id="lesson-search"
+            v-model="searchQuery"
+            @input="handleSearch"
+            @keyup.esc="clearSearch"
+            type="search"
+            placeholder="Search by subject, location or price"
+            :aria-busy="isSearching"
+          />
+          <button v-if="searchQuery" class="toolbar-clear" @click="clearSearch" aria-label="Clear search">
+            ×
+          </button>
+        </div>
       </div>
-      <div class="alert alert-info mt-2 py-2 d-flex align-items-center small" role="alert">
-        <i class="fas fa-info-circle me-2"></i>
-        <span>Search across all lesson details. Results update as you type.</span>
-        <span v-if="searchQuery" class="ms-auto">
-          Press <kbd class="bg-light border rounded px-2 py-1">ESC</kbd> to clear
-        </span>
+      <div class="toolbar-sort">
+        <label class="toolbar-label" for="sortBy">Sort by</label>
+        <div class="toolbar-field">
+          <select id="sortBy" v-model="localSortBy" @change="updateSorting">
+            <option value="subject">Subject</option>
+            <option value="location">Location</option>
+            <option value="price">Price</option>
+            <option value="spaces">Spaces</option>
+          </select>
+          <select v-model="localSortOrder" @change="updateSorting" aria-label="Sort direction">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+        </div>
       </div>
+      <p class="toolbar-summary">
+        {{ sortedLessons.length }} {{ sortedLessons.length === 1 ? 'lesson' : 'lessons' }}
+      </p>
+    </header>
+
+    <div v-if="sortedLessons.length" class="lesson-grid">
+      <LessonCard
+        v-for="lesson in sortedLessons"
+        :key="lesson._id"
+        :lesson="lesson"
+        @add-to-cart="handleAddToCart"
+      />
     </div>
-    
-    <!-- Sorting Controls Section -->
-    <div class="sort-controls">
-      <div class="sort-group">
-        <label for="sortBy">
-          <i class="fas fa-sort"></i>
-          Sort By:
-        </label>
-        <!--
-          v-model: Two-way data binding
-          Creates a connection between the select element and the sortBy data
-          When user changes selection, sortBy updates automatically
-          When sortBy changes in code, the select updates automatically
-        -->
-        <select id="sortBy" v-model="localSortBy" @change="updateSorting">
-          <option value="subject">Subject</option>
-          <option value="location">Location</option>
-          <option value="price">Price</option>
-          <option value="spaces">Available Spaces</option>
-        </select>
-      </div>
-      
-      <div class="sort-group">
-        <label for="sortOrder">
-          <i class="fas fa-arrow-down-short-wide"></i>
-          Order:
-        </label>
-        <select id="sortOrder" v-model="localSortOrder" @change="updateSorting">
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
-        </select>
-      </div>
-      
-      <!-- Results counter -->
-      <div class="results-count">
-        <i class="fas fa-list"></i>
-        {{ sortedLessons.length }} {{ sortedLessons.length === 1 ? 'lesson' : 'lessons' }} available
-      </div>
+
+    <div v-else class="lesson-empty">
+      <p>No lessons match your filters yet. Try adjusting search or sorting.</p>
     </div>
-    
-    <!-- Lessons Grid - display lesson cards in a responsive grid -->
-    <div v-if="sortedLessons.length > 0" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4 lessons-grid">
-      <div v-for="lesson in sortedLessons" :key="lesson._id" class="col">
-        <LessonCard
-          :lesson="lesson"
-          @add-to-cart="handleAddToCart"
-        />
-      </div>
-    </div>
-    
-    <!-- Empty State - shown when no lessons available -->
-    <div v-else class="empty-state">
-      <i class="fas fa-inbox"></i>
-      <h3>No lessons available</h3>
-      <p>Please check back later for new classes</p>
-    </div>
-  </div>
+  </section>
 </template>
 
 <script setup>
@@ -166,21 +129,17 @@ const searchQuery = ref('');
  * whenever lessons, localSortBy, or localSortOrder changes
  */
 const sortedLessons = computed(() => {
-  // Create a copy of the lessons array to avoid mutating the original
   const lessonsCopy = [...props.lessons];
-  
-  // Sort the array based on selected attribute
+
   lessonsCopy.sort((a, b) => {
     let aValue = a[localSortBy.value];
     let bValue = b[localSortBy.value];
-    
-    // For string comparison (subject, location)
+
     if (typeof aValue === 'string') {
       aValue = aValue.toLowerCase();
       bValue = bValue.toLowerCase();
     }
-    
-    // Compare values
+
     if (aValue < bValue) {
       return localSortOrder.value === 'asc' ? -1 : 1;
     }
@@ -189,7 +148,7 @@ const sortedLessons = computed(() => {
     }
     return 0;
   });
-  
+
   return lessonsCopy;
 });
 
@@ -216,23 +175,16 @@ const handleAddToCart = (lesson) => {
   emit('add-to-cart', lesson);
 };
 
-/**
- * Handle search input with debouncing
- */
 const handleSearch = () => {
   if (searchTimeout) {
     clearTimeout(searchTimeout);
   }
-  
+
   searchTimeout = setTimeout(() => {
-    const query = searchQuery.value.trim();
-    emit('search', query);
-  }, 300);
+    emit('search', searchQuery.value.trim());
+  }, 200);
 };
 
-/**
- * Clear search
- */
 const clearSearch = () => {
   searchQuery.value = '';
   if (searchTimeout) {
@@ -243,144 +195,96 @@ const clearSearch = () => {
 </script>
 
 <style scoped>
-/* ========================================
-   COMPONENT STYLES
-   ======================================== */
-
-.lesson-list-container {
-  width: 100%;
-}
-
-/* Sorting Controls */
-.sort-controls {
-  background: var(--surface);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-lg);
-  margin-bottom: var(--spacing-xl);
-  box-shadow: var(--shadow-sm);
-  
-  /* Flexbox layout for controls */
+.lesson-list {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-lg);
-  align-items: center;
+  flex-direction: column;
+  gap: var(--spacing-xl);
 }
 
-.sort-group {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.sort-group label {
-  font-weight: 500;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  white-space: nowrap;
-}
-
-.sort-group select {
-  min-width: 150px;
-  padding: 0.5rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: white;
-  cursor: pointer;
-  font-size: 0.875rem;
-}
-
-.sort-group select:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-/* Results counter */
-.results-count {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.results-count i {
-  color: var(--primary-color);
-}
-
-/* Lessons Grid Layout */
-.lessons-grid {
-  /* CSS Grid for responsive layout */
+.lesson-toolbar {
   display: grid;
-  
-  /* 
-    grid-template-columns: 
-    - repeat(auto-fill, ...) creates as many columns as fit
-    - minmax(280px, 1fr) each column is at least 280px, 
-      and expands equally to fill space
-    This creates a responsive grid that adapts to screen size
-  */
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  
-  /* Spacing between grid items */
   gap: var(--spacing-lg);
-  
-  /* Ensure grid items align to start */
-  align-items: stretch;
-}
-
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: var(--spacing-xl);
-  background: var(--surface);
+  padding: var(--spacing-lg);
+  background: rgba(255, 255, 255, 0.9);
   border-radius: var(--radius-lg);
+  border: 1px solid rgba(148, 163, 184, 0.2);
   box-shadow: var(--shadow-sm);
 }
 
-.empty-state i {
-  font-size: 4rem;
-  color: var(--text-secondary);
-  margin-bottom: var(--spacing-md);
+.toolbar-search,
+.toolbar-sort {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
 
-.empty-state h3 {
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-sm);
+.toolbar-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
 }
 
-.empty-state p {
+.toolbar-field {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.toolbar-field input,
+.toolbar-field select {
+  flex: 1;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  padding: 0.55rem 0.75rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.toolbar-field select {
+  flex: 0;
+  min-width: 140px;
+}
+
+.toolbar-clear {
+  border: none;
+  background: transparent;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
   color: var(--text-secondary);
+  padding: 0 0.5rem;
+}
+
+.toolbar-summary {
   margin: 0;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .sort-controls {
-    flex-direction: column;
-    align-items: stretch;
+.lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.lesson-empty {
+  padding: var(--spacing-xl);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: var(--radius-lg);
+  border: 1px dashed rgba(148, 163, 184, 0.4);
+  color: var(--text-secondary);
+}
+
+@media (min-width: 768px) {
+  .lesson-toolbar {
+    grid-template-columns: 2fr 2fr auto;
+    align-items: center;
   }
-  
-  .sort-group {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .sort-group select {
-    width: 100%;
-  }
-  
-  .results-count {
-    margin-left: 0;
-    justify-content: center;
-  }
-  
-  /* On small screens, make grid single column */
-  .lessons-grid {
-    grid-template-columns: 1fr;
+
+  .toolbar-field select:last-child {
+    min-width: 120px;
   }
 }
 </style>

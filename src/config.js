@@ -22,3 +22,7 @@ export const API_ENDPOINTS = {
     // PUT update lesson spaces (replace :id with actual lesson ID)
     updateLesson: (lessonId) => `${API_BASE_URL}/lessons/${lessonId}`
 };
+
+export const ASSET_ENDPOINTS = {
+    lessonImage: (fileName) => `${API_BASE_URL}/images/${fileName || 'default-lesson.svg'}`
+};

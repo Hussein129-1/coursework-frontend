@@ -16,51 +16,116 @@
 
 <template>
   <!-- Main Application Container -->
-  <div id="app" class="min-vh-100 bg-light">
-    <div class="container py-4">
+  <div id="app" class="app-shell">
+    <div class="container py-5">
       <!-- Hero Banner -->
-      <div class="mb-4">
-        <div class="card shadow-lg border-0 overflow-hidden">
-          <div class="card-body p-4 p-md-5 text-white" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%)">
-            <div class="d-flex align-items-center gap-2 mb-2 opacity-75">
-              <i class="fas fa-star text-warning"></i>
-              <span class="text-uppercase small">Learn • Explore • Grow</span>
-            </div>
-            <h1 class="display-4 fw-bold d-flex align-items-center gap-3 mb-3">
-              <i class="fas fa-graduation-cap"></i>
+      <section class="hero-section position-relative overflow-hidden mb-5">
+        <div class="hero-gradient"></div>
+        <div class="hero-content glass-panel p-4 p-md-5 position-relative">
+          <div class="hero-badge badge-soft">
+            <i class="fas fa-star text-warning"></i>
+            Learn • Explore • Grow
+          </div>
+          <div class="hero-heading">
+            <h1 class="hero-title">
+              <i class="fas fa-graduation-cap hero-icon"></i>
               After School Classes
             </h1>
-            <p class="lead mb-4">Book your favorite classes and activities</p>
-            <div class="d-flex flex-wrap gap-2">
-              <span class="badge bg-white bg-opacity-25 rounded-pill px-3 py-2"><i class="fas fa-book-open me-1"></i> 15+ Subjects</span>
-              <span class="badge bg-white bg-opacity-25 rounded-pill px-3 py-2"><i class="fas fa-user-graduate me-1"></i> Expert Tutors</span>
-              <span class="badge bg-white bg-opacity-25 rounded-pill px-3 py-2"><i class="fas fa-clock me-1"></i> Flexible Times</span>
+            <p class="hero-subtitle">
+              Book inspiring after school experiences designed to spark curiosity and build confidence.
+            </p>
+          </div>
+          <div class="hero-actions d-flex flex-wrap gap-3">
+            <button class="btn btn-primary btn-lg hero-cta" @click="showCart = false">
+              <i class="fas fa-binoculars me-2"></i>
+              Explore Lessons
+            </button>
+            <button
+              class="btn btn-lg hero-cta hero-secondary"
+              :class="{ active: showCart }"
+              :disabled="cartItems.length === 0 && !showCart"
+              @click="toggleCart"
+            >
+              <i :class="['fas', showCart ? 'fa-book-open' : 'fa-shopping-cart', 'me-2']"></i>
+              {{ showCart ? 'Back to Lessons' : 'View Cart (' + cartItemCount + ')' }}
+            </button>
+          </div>
+          <div class="hero-stats mt-4">
+            <div class="hero-stat">
+              <span class="stat-value">15+</span>
+              <span class="stat-label">Subjects</span>
+            </div>
+            <div class="hero-stat">
+              <span class="stat-value">30</span>
+              <span class="stat-label">Expert Tutors</span>
+            </div>
+            <div class="hero-stat">
+              <span class="stat-value">Flexible</span>
+              <span class="stat-label">Schedules</span>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      <!-- Feature Highlights -->
+      <section class="feature-cards row g-4 mb-5">
+        <div class="col-md-4">
+          <div class="feature-card h-100">
+            <div class="feature-icon">
+              <i class="fas fa-lightbulb"></i>
+            </div>
+            <h3>Curated Programmes</h3>
+            <p>Explore a cross-disciplinary catalogue of clubs and sessions handpicked for curious learners.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature-card h-100">
+            <div class="feature-icon">
+              <i class="fas fa-wave-square"></i>
+            </div>
+            <h3>Live Availability</h3>
+            <p>Track real-time spaces and secure seats instantly with responsive search and sorting tools.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature-card h-100">
+            <div class="feature-icon">
+              <i class="fas fa-heart"></i>
+            </div>
+            <h3>Parent-Friendly Checkout</h3>
+            <p>Keep everything organised with a streamlined cart, smart validation and instant confirmations.</p>
+          </div>
+        </div>
+      </section>
+
       <!-- Application Header -->
-      <header class="app-header text-center mb-4">
-        
-        <!-- Shopping Cart Button -->
-        <!--
-          :disabled - Button disabled when cart is empty
-          @click - Toggle between lessons view and cart view
-          :class - Apply different styles based on current view
-        -->
-        <button
-          class="btn btn-lg position-relative"
-          :class="showCart ? 'btn-secondary' : 'btn-primary'"
-          :disabled="cartItems.length === 0 && !showCart"
-          @click="toggleCart"
-        >
-          <i class="fas fa-shopping-cart me-2"></i>
-          {{ showCart ? 'View Lessons' : 'View Cart' }}
-          <!-- Cart badge showing number of items -->
-          <span v-if="cartItemCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            {{ cartItemCount }}
-          </span>
-        </button>
+      <header class="app-header glass-panel mb-4">
+        <div class="header-copy text-center text-lg-start">
+          <p class="header-kicker text-uppercase fw-semibold mb-1">
+            {{ showCart ? 'Checkout Ready' : 'Smart Planning' }}
+          </p>
+          <h2 class="section-title mb-2">
+            {{ showCart ? 'Review your selections' : 'Find the perfect class mix' }}
+          </h2>
+          <p class="section-subtitle mb-0">
+            {{ showCart
+              ? 'Confirm student details and secure your seats before they fill up.'
+              : 'Use search, filters and live availability to craft an engaging timetable.'
+            }}
+          </p>
+        </div>
+        <div class="header-action ms-lg-auto">
+          <button
+            class="btn btn-lg cart-toggle-btn"
+            :class="showCart ? 'btn-success' : 'btn-primary'"
+            :disabled="cartItems.length === 0 && !showCart"
+            @click="toggleCart"
+          >
+            <i v-if="!showCart" class="fas fa-shopping-cart me-2"></i>
+            <i v-else class="fas fa-arrow-left me-2"></i>
+            {{ showCart ? 'Back to Lessons' : 'View Cart (' + cartItemCount + ')' }}
+          </button>
+        </div>
       </header>
 
       <!-- Loading State -->
@@ -68,7 +133,7 @@
         v-if - Conditionally render based on loading state
         Shows animated spinner while fetching data from backend
       -->
-      <div v-if="isLoading" class="loading-state">
+      <div v-if="isLoading" class="loading-state glass-panel p-5">
         <div class="loader-container">
           <div class="spinner-ring">
             <div></div>
@@ -87,7 +152,7 @@
       </div>
 
       <!-- Error State -->
-      <div v-else-if="error" class="error-state">
+      <div v-else-if="error" class="error-state glass-panel p-5">
         <i class="fas fa-exclamation-triangle"></i>
         <h3>Oops! Something went wrong</h3>
         <p>{{ error }}</p>
@@ -98,7 +163,7 @@
       </div>
 
       <!-- Main Content -->
-      <div v-else>
+      <div v-else class="content-shell glass-panel p-4 p-lg-5 shadow-lg">
         <!-- Success Message (after checkout) -->
         <!--
           v-if - Only show when order is successfully submitted
@@ -167,11 +232,10 @@
 // IMPORTS
 // ========================================
 import { ref, computed, onMounted } from 'vue';
-import { API_ENDPOINTS } from './config.js';
+import { API_ENDPOINTS, ASSET_ENDPOINTS } from './config.js';
 
 // Import child components
 import LessonList from './components/LessonList.vue';
-import LessonCard from './components/LessonCard.vue';
 import ShoppingCart from './components/ShoppingCart.vue';
 import CheckoutForm from './components/CheckoutForm.vue';
 
@@ -247,6 +311,11 @@ onMounted(() => {
  * Uses native fetch() as required by coursework
  * Implements Promise-based async/await pattern
  */
+const enhanceLesson = (lesson) => ({
+  ...lesson,
+  imageUrl: ASSET_ENDPOINTS.lessonImage(lesson.image)
+});
+
 const fetchLessons = async () => {
   isLoading.value = true;
   error.value = null;
@@ -265,7 +334,7 @@ const fetchLessons = async () => {
     const data = await response.json();
     
     // Update reactive state with fetched data
-    lessons.value = data;
+    lessons.value = data.map(enhanceLesson);
     
     console.log('✅ Successfully fetched lessons:', data.length);
   } catch (err) {
@@ -299,7 +368,7 @@ const searchLessonsAPI = async (query) => {
     const data = await response.json();
     
     // Update search results
-    searchResults.value = data;
+    searchResults.value = data.map(enhanceLesson);
     isSearchActive.value = true;
     
     console.log(`🔍 Search results for "${query}":`, data.length);
@@ -568,65 +637,187 @@ const submitOrder = async (customerInfo) => {
    COMPONENT STYLES
    ======================================== */
 
-/* Application Header */
-.app-header {
-  text-align: center;
-  margin-bottom: var(--spacing-xl);
-  padding-bottom: var(--spacing-xl);
-  border-bottom: 2px solid var(--border-color);
-  position: relative;
+/* Layout */
+.app-shell {
+  background: transparent;
 }
 
-.app-header h1 {
+.content-shell {
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Hero */
+.hero-section {
+  border-radius: clamp(1rem, 3vw, 2.5rem);
+  box-shadow: 0 35px 80px rgba(79, 70, 229, 0.2);
+}
+
+.hero-gradient {
+  position: absolute;
+  inset: 0;
+  background: var(--primary-gradient);
+  opacity: 0.85;
+  z-index: 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  border-radius: clamp(1rem, 3vw, 2.5rem);
+  overflow: hidden;
+  color: #fff;
+}
+
+.hero-badge {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px);
+}
+
+.hero-heading {
+  margin-top: var(--spacing-md);
+}
+
+.hero-title {
+  font-size: clamp(2.25rem, 3vw + 1rem, 3.5rem);
+  font-weight: 700;
+  margin: 0 0 var(--spacing-sm);
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: var(--spacing-md);
-  margin-bottom: var(--spacing-sm);
 }
 
-.app-header h1 i {
-  color: var(--primary-color);
+.hero-icon {
+  font-size: clamp(2rem, 2vw + 1rem, 3rem);
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.subtitle {
-  color: var(--text-secondary);
-  font-size: 1.1rem;
+.hero-subtitle {
+  font-size: 1.125rem;
   margin-bottom: var(--spacing-lg);
-}
-
-/* Cart Toggle Button */
-.cart-toggle-btn {
-  position: relative;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-}
-
-.cart-toggle-btn.active {
-  background-color: var(--success-color);
-}
-
-.cart-toggle-btn.active:hover {
-  background-color: var(--success-color);
   opacity: 0.9;
 }
 
-/* Cart Badge */
-.cart-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background-color: var(--danger-color);
-  color: white;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
+.hero-actions .btn {
+  box-shadow: 0 18px 30px rgba(15, 23, 42, 0.15);
+}
+
+.hero-cta.hero-secondary {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.hero-cta.hero-secondary:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.hero-cta.hero-secondary.active {
+  background: rgba(16, 185, 129, 0.25);
+  border-color: rgba(16, 185, 129, 0.7);
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.hero-stat {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Feature Cards */
+.feature-cards {
+  margin-top: clamp(2rem, 3vw, 3rem);
+}
+
+.feature-card {
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15);
+}
+
+.feature-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  background: var(--accent-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-md);
+}
+
+.feature-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.feature-card p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* Application Header */
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+  align-items: center;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.header-kicker {
+  letter-spacing: 0.18em;
+  color: var(--primary-color);
   font-size: 0.75rem;
-  font-weight: 700;
-  border: 2px solid var(--surface);
+}
+
+.cart-toggle-btn {
+  position: relative;
+  padding: 0.85rem 1.75rem;
+  font-size: 1rem;
+  min-width: 230px;
+  border-radius: var(--radius-lg);
+}
+
+.cart-toggle-btn.btn-success {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.85), rgba(5, 150, 105, 0.85));
+  border: none;
+}
+
+.cart-toggle-btn.btn-success:hover {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.92));
 }
 
 /* Loading State */
