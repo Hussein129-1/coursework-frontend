@@ -27,3 +27,5 @@ DOCUMENTATION_QUICK_START.md
 *.njsproj
 *.sln
 *.sw?
+
+dev-backup
