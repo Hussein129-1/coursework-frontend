@@ -18,6 +18,7 @@
   <!-- Main Application Container -->
   <div id="app" class="app-shell">
     <div class="app-container">
+      <!-- Top header bar with app title and cart toggle button -->
       <header class="app-header">
         <div class="app-header__copy">
           <h1 class="app-title">
@@ -40,6 +41,7 @@
       </header>
 
       <main class="app-main">
+        <!-- Status panel shown while lessons are loading -->
         <section v-if="isLoading" class="panel panel--status">
           <div class="panel__icon">
             <i class="fas fa-spinner fa-spin"></i>
@@ -48,6 +50,7 @@
           <p class="panel__subtitle">Hang tight while we fetch the latest availability.</p>
         </section>
 
+        <!-- Error panel shown when there is a problem fetching lessons from the backend -->
         <section v-else-if="error" class="panel panel--status panel--error">
           <div class="panel__icon">
             <i class="fas fa-exclamation-triangle"></i>
@@ -59,7 +62,9 @@
           </button>
         </section>
 
+        <!-- Main content area when lessons are loaded successfully and there is no error -->
         <section v-else class="app-content">
+          <!-- Success alert shown briefly after a successful booking -->
           <transition name="fade" mode="out-in">
             <div v-if="showSuccessMessage" key="success" class="alert alert--success">
               <i class="fas fa-check-circle"></i>
@@ -74,6 +79,7 @@
             </div>
           </transition>
 
+          <!-- Show lessons list view when the cart is not currently open -->
           <div v-if="!showCart" class="lessons-view">
             <LessonList
               :lessons="displayedLessons"
@@ -87,6 +93,7 @@
             />
           </div>
 
+          <!-- Otherwise show the cart and checkout columns side by side -->
           <div v-else class="cart-view">
             <section class="cart-column">
               <ShoppingCart
@@ -103,6 +110,7 @@
                 @submit-order="submitOrder"
                 ref="checkoutFormRef"
               />
+              <!-- Empty state panel when there are no items in the cart -->
               <div v-else class="panel panel--status panel--empty">
                 <div class="panel__icon">
                   <i class="fas fa-box-open"></i>

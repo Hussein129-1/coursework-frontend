@@ -15,12 +15,17 @@
 -->
 
 <template>
+  <!-- Section that contains the toolbar (search + sort) and the grid of lessons -->
   <section class="lesson-list">
+    <!-- Toolbar at the top of the list -->
     <header class="lesson-toolbar">
+      <!-- Search controls: label, input, clear button and loading spinner -->
       <div class="toolbar-search">
         <label class="toolbar-label" for="lesson-search">Search</label>
         <div class="toolbar-field">
+          <!-- Magnifying-glass icon for visual cue -->
           <i class="fas fa-search toolbar-icon" aria-hidden="true"></i>
+          <!-- Search input bound to searchQuery and emitting search events to parent -->
           <input
             id="lesson-search"
             class="toolbar-input"
@@ -31,6 +36,7 @@
             placeholder="Search subject, location or price"
             :aria-busy="isBusy"
           />
+          <!-- Clear button only appears when there is text in the search box -->
           <button
             v-if="searchQuery"
             class="toolbar-clear"
@@ -39,9 +45,11 @@
           >
             ×
           </button>
+          <!-- Small spinner shown while a backend search request is in progress -->
           <span v-if="isBusy" class="toolbar-spinner" aria-hidden="true"></span>
         </div>
       </div>
+      <!-- Sorting controls: user can choose attribute and sort order -->
       <div class="toolbar-sort">
         <label class="toolbar-label" for="sortBy">Sort by</label>
         <div class="toolbar-field toolbar-field--inline">
@@ -57,11 +65,13 @@
           </select>
         </div>
       </div>
+      <!-- Small text summary showing how many lessons are currently visible -->
       <p class="toolbar-summary">
         {{ sortedLessons.length }} {{ sortedLessons.length === 1 ? 'lesson' : 'lessons' }}
       </p>
     </header>
 
+    <!-- Show a responsive grid of LessonCard components when there are lessons to display -->
     <div v-if="sortedLessons.length" class="lesson-grid">
       <LessonCard
         v-for="lesson in sortedLessons"
@@ -71,6 +81,7 @@
       />
     </div>
 
+    <!-- Message shown when no lessons match the current search or sorting filters -->
     <div v-else class="lesson-empty">
       <p>No lessons match your filters yet. Try adjusting search or sorting.</p>
     </div>
@@ -185,16 +196,25 @@ const handleAddToCart = (lesson) => {
   emit('add-to-cart', lesson);
 };
 
+/**
+ * Handle search input with a small debounce
+ * Waits 200ms after typing before emitting the search query to the parent
+ */
 const handleSearch = () => {
   if (searchTimeout) {
     clearTimeout(searchTimeout);
   }
 
   searchTimeout = setTimeout(() => {
+    // Emit the trimmed search query string to App.vue
     emit('search', searchQuery.value.trim());
   }, 200);
 };
 
+/**
+ * Clear the current search query and reset the lesson list
+ * Also cancels any pending debounced search call
+ */
 const clearSearch = () => {
   searchQuery.value = '';
   if (searchTimeout) {

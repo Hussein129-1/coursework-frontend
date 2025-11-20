@@ -14,6 +14,7 @@
 -->
 
 <template>
+  <!-- Outer wrapper for the checkout card shown next to the cart items -->
   <div class="checkout-form">
     <!-- Form Title -->
     <h3>
@@ -21,7 +22,7 @@
       Customer Information
     </h3>
     
-    <!-- Checkout Form -->
+    <!-- Checkout Form (submit prevented so we can handle it in Vue) -->
     <form @submit.prevent="handleSubmit">
       <!-- Name Input Field -->
       <div class="form-group">
@@ -97,7 +98,7 @@
         {{ isSubmitting ? 'Processing...' : 'Complete Checkout' }}
       </button>
       
-      <!-- Form validation summary -->
+      <!-- Form validation summary shown whenever the form is currently invalid -->
       <div v-if="!isFormValid" class="validation-summary">
         <i class="fas fa-info-circle"></i>
         Please fill in all required fields correctly
@@ -118,6 +119,7 @@ import { ref, computed } from 'vue';
 const props = defineProps({
   cartItems: {
     type: Array,
+    // Parent (App.vue) passes the current cart contents for order creation
     required: true
   },
   isSubmitting: {
